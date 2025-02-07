@@ -13,9 +13,7 @@ typedef struct {
     d4thrd_t *thrdpool;
 } server_t;
 
-extern server_t *srv;
-
-void server_create();
-void server_listen();
+server_t* server_create();
+void server_listen(server_t *srv);
 
 #endif

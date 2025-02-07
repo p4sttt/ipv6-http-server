@@ -2,10 +2,13 @@
 #include "cmd_options.h"
 
 int main(int argc, char **argv) {
+    server_t *srv;
 
     parse_cmd_options(argc, argv);   
-    server_create();
-    server_listen();
+
+    srv = server_create();
+    server_listen(srv);
 
     return 0;
 }
+
