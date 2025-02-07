@@ -1,10 +1,12 @@
 #ifndef CMD_OPTIONS_H_
 #define CMD_OPTIONS_H_
 
+#include "common.h"
+
 typedef struct {
     int port;
     int threads_count;
-    int log;
+    log_level_t log;
 } cmd_options_t;
 
 extern cmd_options_t options;
