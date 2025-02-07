@@ -12,12 +12,10 @@
 #include "common.h"
 #include "http.h"
 
-#define REQUEST_SIZE 1024
-
 server_t *server_create() {
+    int err;
     server_t *srv;
     struct sockaddr_in6 srv_addr;
-    int err;
     char srv_addrp[INET6_ADDRSTRLEN];
 
     srv = malloc(sizeof(*srv));
@@ -48,9 +46,9 @@ void server_listen(server_t *srv) {
     int cnfd, err;
     struct sockaddr_in6 cnaddr;
     http_req_t http_req;
+    http_res_t http_res;
     socklen_t socklen;
-    char cnaddrp[INET6_ADDRSTRLEN];
-    char reqbuf[REQUEST_SIZE];
+    char cnaddrp[INET6_ADDRSTRLEN], reqbuf[REQUEST_SIZE], resbuf[RESPONSE_SIZE] = "";
 
     err = listen(srv->sockfd, SOMAXCONN);
     if (err == -1) {
@@ -76,7 +74,26 @@ void server_listen(server_t *srv) {
             continue;
         }
 
-        send(cnfd, "HTTP/1.0 200 OK\r\nContent-Length: 0\r\n\r\n", 38, 0);
+        http_res.line.version = "HTTP/1.0";
+        http_res.line.status_code = 200;
+        http_res.line.reason_phrase = "OK";
+
+        err = load_html("index.html", &http_res.body);
+        if (err == -1) {
+            log_warn("failed to create body");
+            send(cnfd, "HTTP/1.0 500 Internal Server Error\r\n\r\n", 36, 0);
+            close(cnfd);
+            continue;
+        }
+
+        err = compose_http_res(&http_res, resbuf);
+        if (err == -1) {
+            log_warn("failed to create response");
+            send(cnfd, "HTTP/1.0 500 Internal Server Error\r\n\r\n", 36, 0);
+        } else {
+            send(cnfd, resbuf, RESPONSE_SIZE, 0);
+        }
+
         close(cnfd);
     }
 

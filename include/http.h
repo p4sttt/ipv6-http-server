@@ -1,6 +1,9 @@
 #ifndef HTTP_H_
 #define HTTP_H_
 
+#define REQUEST_SIZE 1024
+#define RESPONSE_SIZE 1024
+
 /*
 RFC: https://www.rfc-editor.org/rfc/rfc1945#section-4.3
 general-header = Date
@@ -115,10 +118,11 @@ typedef struct {
     status_line line;
     res_hdr_t res_hdr;
     ent_hdr_t entity_hdr;
-    const char *body;
+    char *body;
 } http_res_t;
 
 int parse_http_req(char *req, http_req_t *http_req);
 int compose_http_res(http_res_t *http_res, char *res);
+int load_html(const char *path, char **body);
 
 #endif
