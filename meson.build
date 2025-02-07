@@ -6,7 +6,8 @@ src = [
     'src/main.c',
     'src/cmd_options.c',
     'src/server.c',
-    'src/common.c'
+    'src/common.c',
+    'src/http.c',
 ]
 
 executable('srv', src, include_directories: incdir, c_args: args)
